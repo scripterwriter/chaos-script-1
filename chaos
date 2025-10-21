@@ -147,7 +147,7 @@ local StarterGui = game:GetService("StarterGui")
 local LocalPlayer = Players.LocalPlayer
 
 local AimbotEnabled = false
-local AimKey = Enum.KeyCode.Q
+local AimKey = Enum.KeyCode.R
 local AimRadius = 200
 local Target = nil
 local LostTargetTime = 0
@@ -424,7 +424,7 @@ local Button = Tab:CreateButton({
 
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.R then
+    if input.KeyCode == Enum.KeyCode.Q then
         doDash()
     end
 end)
