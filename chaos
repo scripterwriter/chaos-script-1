@@ -1,0 +1,449 @@
+-- 🌌 SETTINGS
+getgenv().HBE = true -- Hitbox Expander
+shared.settings = {
+   killaura = false,
+   maxdistance = 30,
+   debugging = false
+}
+
+-- 🌌 SERVICES
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local CHAR_PARENT
+
+-- 🌌 FUNCTIONS
+local function GetCharParent()
+    repeat task.wait() until LocalPlayer.Character
+    for _, char in pairs(workspace:GetDescendants()) do
+        if string.find(char.Name, LocalPlayer.Name) and char:FindFirstChild("Humanoid") then
+            return char.Parent
+        end
+    end
+end
+CHAR_PARENT = GetCharParent()
+
+local function getchar(plr,yield)
+   local plr = plr or LocalPlayer
+   return plr.Character or yield and plr.CharacterAdded:Wait()
+end
+
+local function gethumanoid(plr,yield)
+   local plr = plr or LocalPlayer
+   local char = getchar(plr,yield)
+   return yield and char:WaitForChild("Humanoid") or char:FindFirstChildWhichIsA("Humanoid")
+end
+
+local function getDamageRemote()
+   local char = getchar(nil,true)
+   local Tool = char:FindFirstChildWhichIsA("Tool")
+   return Tool and Tool:FindFirstChild("DamageRemote")
+end
+
+local function GetClosestPlayer()
+   local dist = shared.settings.maxdistance or math.huge
+   local closest_player
+   for _,v in next, Players:GetPlayers() do
+       if v ~= LocalPlayer then
+           local char = getchar(v)
+           if char and not char:FindFirstChildWhichIsA("ForceField") then
+               local BasePart = char:FindFirstChildWhichIsA("BasePart")
+               local Humanoid = gethumanoid(v)
+               local DistanceFromTarget = BasePart and LocalPlayer:DistanceFromCharacter(BasePart.CFrame.Position)
+               if DistanceFromTarget and DistanceFromTarget <= dist and Humanoid and Humanoid.Health > 0 then
+                   dist = DistanceFromTarget
+                   closest_player = v
+               end
+           end
+       end
+   end
+   return closest_player,dist    
+end
+
+-- 🌌 HITBOX EXPANDER
+local HITBOX_SIZE = Vector3.new(15,15,15)
+local HITBOX_COLOUR = Color3.fromRGB(27, 42, 53)
+
+local function AssignHitboxes(player)
+    if player == LocalPlayer then return end
+    RunService.RenderStepped:Connect(function()
+        local char = CHAR_PARENT:FindFirstChild(player.Name)
+        if getgenv().HBE then
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local hrp = char.HumanoidRootPart
+                hrp.Size = HITBOX_SIZE
+                hrp.Color = HITBOX_COLOUR
+                hrp.CanCollide = false
+                hrp.Transparency = 0.8
+            end
+        else
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local hrp = char.HumanoidRootPart
+                hrp.Size = Vector3.new(2,2,1)
+                hrp.Transparency = 1
+            end
+        end
+    end)
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if getgenv().HBE then
+        AssignHitboxes(player)
+    end
+end)
+
+-- 🌌 LOAD RAYFIELD
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Window = Rayfield:CreateWindow({
+   Name = "EX Hub",
+   Icon = 0,
+   LoadingTitle = "Loading",
+   LoadingSubtitle = "by Darren",
+   ShowText = "Hub",
+   Theme = "Amethyst",
+   ToggleUIKeybind = "K",
+})
+
+-- 🌌 TABS
+local Tab = Window:CreateTab("Main", 4483362458)
+local AuraTab = Window:CreateTab("Kill Aura", 4483362458)
+local ScriptsTab = Window:CreateTab("Scripts", 4483362458)
+-- 🌌 HITBOX TOGGLE
+Tab:CreateToggle({
+    Name = "Hitbox",
+    CurrentValue = true,
+    Callback = function(Value)
+        getgenv().HBE = Value
+        if Value then
+            for _, player in ipairs(Players:GetPlayers()) do
+                AssignHitboxes(player)
+            end
+        end
+    end,
+})
+
+-- 🌌 HITBOX SLIDER
+Tab:CreateSlider({
+    Name = "Hitbox Size",
+    Range = {2, 50},
+    Increment = 1,
+    Suffix = "Size",
+    CurrentValue = 15,
+    Callback = function(Value)
+        HITBOX_SIZE = Vector3.new(Value, Value, Value)
+    end,
+})
+HitboxSection = Tab:CreateSection("Others")
+HitboxButton = Tab:CreateButton({
+   Name = "Aimbot",
+   Callback = function()
+   -- DEPENDS ON FPS, RECOMMENDEDED 45/60+ FPS
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
+local StarterGui = game:GetService("StarterGui")
+local LocalPlayer = Players.LocalPlayer
+
+local AimbotEnabled = false
+local AimKey = Enum.KeyCode.Q
+local AimRadius = 200
+local Target = nil
+local LostTargetTime = 0
+local TargetLossDelay = 0.5
+
+local ESP_Box = Drawing.new("Square")
+ESP_Box.Thickness = 1
+ESP_Box.Color = Color3.fromRGB(255, 255, 255)
+ESP_Box.Visible = false
+ESP_Box.Transparency = 1
+ESP_Box.Filled = false
+
+local ESP_Text = Drawing.new("Text")
+ESP_Text.Size = 16
+ESP_Text.Center = true
+ESP_Text.Outline = true
+ESP_Text.Color = Color3.fromRGB(255, 255, 255)
+ESP_Text.Visible = false
+
+local function Notify(title, text, duration)
+    pcall(function()
+        StarterGui:SetCore("SendNotification", {
+            Title = title,
+            Text = text,
+            Duration = duration or 3
+        })
+    end)
+end
+
+local function IsEnemy(player)
+    if LocalPlayer.Team and player.Team then
+        return LocalPlayer.Team ~= player.Team
+    end
+    return true
+end
+
+local function GetNearestPlayerWithinRadius()
+    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    local closestPlayer = nil
+    local closestDistance = math.huge
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and IsEnemy(player) and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local humanoidRootPart = player.Character.HumanoidRootPart
+            local screenPosition, onScreen = Camera:WorldToScreenPoint(humanoidRootPart.Position)
+
+            if onScreen then
+                local distance = (Vector2.new(screenPosition.X, screenPosition.Y) - screenCenter).Magnitude
+                if distance <= AimRadius and distance < closestDistance then
+                    closestDistance = distance
+                    closestPlayer = player
+                end
+            end
+        end
+    end
+
+    return closestPlayer
+end
+
+local function AimAt(targetPart)
+    if targetPart then
+        Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetPart.Position)
+    end
+end
+
+UserInputService.InputBegan:Connect(function(input, isProcessed)
+    if isProcessed then return end
+    if input.KeyCode == AimKey then
+        AimbotEnabled = not AimbotEnabled
+        ESP_Box.Visible = false
+        ESP_Text.Visible = false
+        if AimbotEnabled then
+            Notify("Aimbot", "Aimbot Enabled", 3)
+        else
+            Notify("Aimbot", "Aimbot Disabled", 3)
+            Target = nil
+        end
+    end
+end)
+
+RunService.RenderStepped:Connect(function(dt)
+    if AimbotEnabled then
+        local valid = Target and Target.Character and Target.Character:FindFirstChild("HumanoidRootPart") and Target.Character:FindFirstChild("Head") and Target.Character:FindFirstChildOfClass("Humanoid") and Target.Character:FindFirstChildOfClass("Humanoid").Health > 0
+
+        if not valid then
+            LostTargetTime += dt
+            if LostTargetTime >= TargetLossDelay then
+                local oldTarget = Target
+                Target = GetNearestPlayerWithinRadius()
+                LostTargetTime = 0
+                if oldTarget and Target and Target ~= oldTarget then
+                    Notify("Aimbot", "Your target has left the game or teleported too fast.\nNow aiming at: " .. (Target.DisplayName or Target.Name), 3)
+                end
+            end
+        else
+            LostTargetTime = 0
+        end
+
+        if Target and Target.Character then
+            local hrp = Target.Character:FindFirstChild("HumanoidRootPart")
+            local head = Target.Character:FindFirstChild("Head")
+            local humanoid = Target.Character:FindFirstChildOfClass("Humanoid")
+
+            if hrp and head and humanoid then
+                AimAt(hrp)
+
+                local hrpPos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+                local headPos = Camera:WorldToViewportPoint(head.Position + Vector3.new(0, 0.5, 0))
+                local footPos = Camera:WorldToViewportPoint(hrp.Position - Vector3.new(0, 3, 0))
+
+                if onScreen then
+                    local boxHeight = math.abs(headPos.Y - footPos.Y)
+                    local boxWidth = boxHeight / 2
+                    ESP_Box.Position = Vector2.new(hrpPos.X - boxWidth / 2, headPos.Y)
+                    ESP_Box.Size = Vector2.new(boxWidth, boxHeight)
+                    ESP_Box.Visible = true
+
+                    local studs = (Camera.CFrame.Position - hrp.Position).Magnitude
+                    ESP_Text.Text = string.format("Name: %s | Health: %d | Studs: %.0f", Target.Name, humanoid.Health, studs)
+                    ESP_Text.Position = Vector2.new(hrpPos.X, headPos.Y - 20)
+                    ESP_Text.Visible = true
+                else
+                    ESP_Box.Visible = false
+                    ESP_Text.Visible = false
+                end
+            else
+                ESP_Box.Visible = false
+                ESP_Text.Visible = false
+            end
+        else
+            ESP_Box.Visible = false
+            ESP_Text.Visible = false
+        end
+    else
+        ESP_Box.Visible = false
+        ESP_Text.Visible = false
+    end
+end)
+
+Notify("Aimbot", "Aimbot Initialized. Press 'Q' to toggle. (OR WHATEVER KEYBIND YOU HAS SET)", 5)
+   end,
+})
+
+
+
+
+-- 🌌 KILL AURA TOGGLE
+AuraTab:CreateToggle({
+    Name = "Kill Aura(not availiable)",
+    CurrentValue = false,
+    Callback = function(Value)
+        shared.settings.killaura = Value
+    end,
+})
+
+-- 🌌 KILL AURA RANGE SLIDER
+AuraTab:CreateSlider({
+    Name = "Aura Range(not avaliable)",
+    Range = {5, 100},
+    Increment = 1,
+    Suffix = "Studs",
+    CurrentValue = 30,
+    Callback = function(Value)
+        shared.settings.maxdistance = Value
+    end,
+})
+
+
+
+-- 🌌 LOOP HANDLER FOR KILL AURA
+task.spawn(function()
+    while task.wait() do
+        if shared.settings.killaura then
+            local DamageRemote = getDamageRemote()
+            if DamageRemote then
+                local Target,Distance = GetClosestPlayer()
+                if Target then
+                    DamageRemote:FireServer(gethumanoid(Target))
+                    if shared.settings.debugging then
+                        warn("Attacked",Target,"from",Distance,"studs away")
+                    end
+                end
+            end
+        end
+    end
+end)
+
+
+OthersButton = Tab:CreateButton({
+   Name = "Remove holloween",
+   Callback = function()
+   function RemoveEvent()
+    local evento = game.Players.LocalPlayer.PlayerGui:FindFirstChild("Event!")
+    if evento then
+        evento:Destroy()
+    end
+end
+
+RemoveEvent()
+
+game.Players.LocalPlayer.CharacterAdded:Connect(function()
+    wait(0.5)
+    RemoveEvent()
+end)
+   end,
+})
+
+
+
+-- 🌌 SETTINGS
+local dashPower = 100
+local dashDuration = 0.3
+local jumpBoost = 2
+local jumpBoostDuration = 1
+
+-- 🌌 STATE
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local jumpBoostActive = false
+
+-- 🌌 FUNCTIONS
+local function doDash()
+    local char = LocalPlayer.Character
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hrp or not hum then return end
+
+    -- Jump boost (temporary)
+    if not jumpBoostActive then
+        jumpBoostActive = true
+        local originalJP = hum.JumpPower
+        hum.JumpPower = originalJP + jumpBoost
+        hum:ChangeState(Enum.HumanoidStateType.Jumping)
+
+        task.delay(jumpBoostDuration, function()
+            if hum then
+                hum.JumpPower = originalJP
+            end
+            jumpBoostActive = false
+        end)
+    end
+
+    -- Side dash
+    local moveDir = hum.MoveDirection
+    local rightVec = hrp.CFrame.RightVector
+    local dashDir = (moveDir:Dot(rightVec) > 0) and rightVec or -rightVec
+
+    local velocity = Instance.new("BodyVelocity")
+    velocity.Velocity = dashDir * dashPower
+    velocity.MaxForce = Vector3.new(1e5, 0, 1e5) -- sideways only
+    velocity.Parent = hrp
+
+    game:GetService("Debris"):AddItem(velocity, dashDuration)
+
+    -- 🌌 Rayfield Notification
+    Rayfield:Notify({
+        Title = "Dash Activated",
+        Content = "You dashed with a +2 Jump Boost!",
+        Duration = 3,
+        Image = 4483362458,
+    })
+end
+
+-- 🌌 RAYFIELD BUTTON
+local Button = Tab:CreateButton({
+    Name = "Mid-Air Side Dash",
+    Callback = function()
+        doDash()
+    end,
+})
+
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.R then
+        doDash()
+    end
+end)
+
+
+
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local hum = Character:WaitForChild("Humanoid")
+local hrp = Character:WaitForChild("HumanoidRootPart")
+
+local dashPower = 60 -- adjust power
+
+
+ScriptsButton = ScriptsTab:CreateButton({
+   Name = "Freegamepass and more",
+   Callback = function()
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/Bytescode42/BytesCodeChaos/refs/heads/main/BytesChaos.lua"))()
+   end,
+})
