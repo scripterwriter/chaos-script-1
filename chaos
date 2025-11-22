@@ -465,12 +465,13 @@ WeaponTab:CreateToggle({
     CurrentValue = false,
     Flag = "EmeraldGS_Toggle",
     Callback = function(Value)
-         if Value then
-              equippedWeapons[name] = value
-            if value and LocalPlayer.Character then
-                EquipWeapon(name)
+        if Value and LocalPlayer.Character then
+            equippedWeapons["Emerald Greatsword"] = true
+            EquipWeapon("Emerald Greatsword")
             local args = {"Emerald Greatsword"}
             game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
+        else
+            equippedWeapons["Emerald Greatsword"] = false
         end
     end,
 })
@@ -481,12 +482,13 @@ WeaponTab:CreateToggle({
     CurrentValue = false,
     Flag = "BloodDagger_Toggle",
     Callback = function(Value)
-         if Value then
-            equippedWeapons[name] = value
-            if value and LocalPlayer.Character then
-                EquipWeapon(name)
+        if Value and LocalPlayer.Character then
+            equippedWeapons["Blood Dagger"] = true
+            EquipWeapon("Blood Dagger")
             local args = {"Blood Dagger"}
             game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
+        else
+            equippedWeapons["Blood Dagger"] = false
         end
     end,
 })
@@ -497,12 +499,13 @@ WeaponTab:CreateToggle({
     CurrentValue = false,
     Flag = "FrostSpear_Toggle",
     Callback = function(Value)
-         if Value then
-             equippedWeapons[name] = value
-            if value and LocalPlayer.Character then
-                EquipWeapon(name)
+        if Value and LocalPlayer.Character then
+            equippedWeapons["Frost Spear"] = true
+            EquipWeapon("Frost Spear")
             local args = {"Frost Spear"}
             game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
+        else
+            equippedWeapons["Frost Spear"] = false
         end
     end,
 })
