@@ -108,6 +108,7 @@ local Window = Rayfield:CreateWindow({
 local Tab = Window:CreateTab("Main", 4483362458)
 local AuraTab = Window:CreateTab("Kill Aura", 4483362458)
 local ScriptsTab = Window:CreateTab("Scripts", 4483362458)
+local ScriptsTab = Window:CreateTab("Weapons", 4483362458)
 -- 🌌 HITBOX TOGGLE
 Tab:CreateToggle({
     Name = "Hitbox",
@@ -442,7 +443,7 @@ local dashPower = 60 -- adjust power
 
 
 ScriptsButton = ScriptsTab:CreateButton({
-   Name = "Freegamepass and more",
+   Name = "Bystes",
    Callback = function()
   loadstring(game:HttpGet("https://raw.githubusercontent.com/Bytescode42/BytesCodeChaos/refs/heads/main/BytesChaos.lua"))()
    end,
@@ -450,8 +451,48 @@ ScriptsButton = ScriptsTab:CreateButton({
 
 
 ScriptsButton = ScriptsTab:CreateButton({
-   Name = "Freegamepass and more",
+   Name = "Notalive",
    Callback = function()
   loadstring(game:HttpGet("https://raw.githubusercontent.com/notaliveinfinity/notalive-chaos/refs/heads/main/notalive"))()
    end,
+})
+
+
+-- Emerald Greatsword Toggle
+WeaponTab:CreateToggle({
+    Name = "Emerald Greatsword",
+    CurrentValue = false,
+    Flag = "EmeraldGS_Toggle",
+    Callback = function(Value)
+        if Value then
+            local args = {"Emerald Greatsword"}
+            game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
+        end
+    end,
+})
+
+-- Blood Dagger Toggle
+WeaponTab:CreateToggle({
+    Name = "Blood Dagger",
+    CurrentValue = false,
+    Flag = "BloodDagger_Toggle",
+    Callback = function(Value)
+        if Value then
+            local args = {"Blood Dagger"}
+            game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
+        end
+    end,
+})
+
+-- Frost Spear Toggle
+WeaponTab:CreateToggle({
+    Name = "Frost Spear",
+    CurrentValue = false,
+    Flag = "FrostSpear_Toggle",
+    Callback = function(Value)
+        if Value then
+            local args = {"Frost Spear"}
+            game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
+        end
+    end,
 })
