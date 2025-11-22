@@ -459,19 +459,23 @@ ScriptsButton = ScriptsTab:CreateButton({
 })
 
 
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Make sure this table exists
+equippedWeapons = equippedWeapons or {}
+
 -- Emerald Greatsword Toggle
 WeaponTab:CreateToggle({
     Name = "Emerald Greatsword",
     CurrentValue = false,
     Flag = "EmeraldGS_Toggle",
     Callback = function(Value)
+        equippedWeapons["Emerald Greatsword"] = Value
         if Value and LocalPlayer.Character then
-            equippedWeapons["Emerald Greatsword"] = true
             EquipWeapon("Emerald Greatsword")
             local args = {"Emerald Greatsword"}
-            game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
-        else
-            equippedWeapons["Emerald Greatsword"] = false
+            LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
         end
     end,
 })
@@ -482,13 +486,11 @@ WeaponTab:CreateToggle({
     CurrentValue = false,
     Flag = "BloodDagger_Toggle",
     Callback = function(Value)
+        equippedWeapons["Blood Dagger"] = Value
         if Value and LocalPlayer.Character then
-            equippedWeapons["Blood Dagger"] = true
             EquipWeapon("Blood Dagger")
             local args = {"Blood Dagger"}
-            game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
-        else
-            equippedWeapons["Blood Dagger"] = false
+            LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
         end
     end,
 })
@@ -499,13 +501,11 @@ WeaponTab:CreateToggle({
     CurrentValue = false,
     Flag = "FrostSpear_Toggle",
     Callback = function(Value)
+        equippedWeapons["Frost Spear"] = Value
         if Value and LocalPlayer.Character then
-            equippedWeapons["Frost Spear"] = true
             EquipWeapon("Frost Spear")
             local args = {"Frost Spear"}
-            game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
-        else
-            equippedWeapons["Frost Spear"] = false
+            LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
         end
     end,
 })
