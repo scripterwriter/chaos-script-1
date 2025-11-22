@@ -466,7 +466,6 @@ WeaponTab:CreateToggle({
     Callback = function(Value)
         if Value then
       while do true 
-         task.wait()
             local args = {"Emerald Greatsword"}
             game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
         end
@@ -481,7 +480,6 @@ WeaponTab:CreateToggle({
     Callback = function(Value)
         if Value then
       while do true 
-         task.wait()
             local args = {"Blood Dagger"}
             game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
         end
@@ -495,8 +493,7 @@ WeaponTab:CreateToggle({
     Flag = "FrostSpear_Toggle",
     Callback = function(Value)
         if Value then  
-      while do true 
-         task.wait()
+      while do true
             local args = {"Frost Spear"}
             game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
         end
