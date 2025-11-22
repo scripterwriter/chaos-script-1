@@ -447,3 +447,11 @@ ScriptsButton = ScriptsTab:CreateButton({
   loadstring(game:HttpGet("https://raw.githubusercontent.com/Bytescode42/BytesCodeChaos/refs/heads/main/BytesChaos.lua"))()
    end,
 })
+
+
+ScriptsButton = ScriptsTab:CreateButton({
+   Name = "Freegamepass and more",
+   Callback = function()
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/notaliveinfinity/notalive-chaos/refs/heads/main/notalive"))()
+   end,
+})
