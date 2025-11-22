@@ -108,7 +108,7 @@ local Window = Rayfield:CreateWindow({
 local Tab = Window:CreateTab("Main", 4483362458)
 local AuraTab = Window:CreateTab("Kill Aura", 4483362458)
 local ScriptsTab = Window:CreateTab("Scripts", 4483362458)
-local ScriptsTab = Window:CreateTab("Weapons", 4483362458)
+local ScriptsTab = Window:CreateTab("Weapon", 4483362458)
 -- 🌌 HITBOX TOGGLE
 Tab:CreateToggle({
     Name = "Hitbox",
@@ -458,7 +458,7 @@ ScriptsButton = ScriptsTab:CreateButton({
 })
 
 
--- Emerald Greatsword Toggle
+
 WeaponTab:CreateToggle({
     Name = "Emerald Greatsword",
     CurrentValue = false,
