@@ -465,6 +465,7 @@ WeaponTab:CreateToggle({
     CurrentValue = false,
     Flag = "EmeraldGS_Toggle",
     Callback = function(Value)
+         if Value then
               equippedWeapons[name] = value
             if value and LocalPlayer.Character then
                 EquipWeapon(name)
@@ -480,6 +481,7 @@ WeaponTab:CreateToggle({
     CurrentValue = false,
     Flag = "BloodDagger_Toggle",
     Callback = function(Value)
+         if Value then
             equippedWeapons[name] = value
             if value and LocalPlayer.Character then
                 EquipWeapon(name)
@@ -495,6 +497,7 @@ WeaponTab:CreateToggle({
     CurrentValue = false,
     Flag = "FrostSpear_Toggle",
     Callback = function(Value)
+         if Value then
              equippedWeapons[name] = value
             if value and LocalPlayer.Character then
                 EquipWeapon(name)
