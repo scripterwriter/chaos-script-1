@@ -459,40 +459,18 @@ ScriptsButton = ScriptsTab:CreateButton({
 
 
 
-WeaponTab:CreateToggle({
-    Name = "Emerald Greatsword",
-    CurrentValue = false,
-    Flag = "EmeraldGS_Toggle",
-    Callback = function(Value)
-        if Value then
-            local args = {"Emerald Greatsword"}
-            game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
-        end
-    end,
-})
-
--- Blood Dagger Toggle
-WeaponTab:CreateToggle({
-    Name = "Blood Dagger",
-    CurrentValue = false,
-    Flag = "BloodDagger_Toggle",
-    Callback = function(Value)
-        if Value then
-            local args = {"Blood Dagger"}
-            game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
-        end
-    end,
-})
-
--- Frost Spear Toggle
-WeaponTab:CreateToggle({
-    Name = "Frost Spear",
-    CurrentValue = false,
-    Flag = "FrostSpear_Toggle",
-    Callback = function(Value)
-        if Value then 
-            local args = {"Frost Spear"}
-            game:GetService("Players").LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
-        end
-    end,
+Weapontoggle = WeaponTab:CreateToggle({
+   Name = "Toggle Example",
+   CurrentValue = false,
+   Flag = "Toggle1",
+   Callback = function(Value)
+     if value then
+     equippedWeapons[name] = value
+            if value and LocalPlayer.Character then
+                EquipWeapon(name)
+  local args = {
+    "Emerald Greatsword"
+}
+game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("Menu Screen"):WaitForChild("RemoteEvent"):FireServer(unpack(args))
+   end,
 })
