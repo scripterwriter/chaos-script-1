@@ -459,11 +459,37 @@ ScriptsButton = ScriptsTab:CreateButton({
 })
 
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-
 -- Make sure this table exists
 equippedWeapons = equippedWeapons or {}
+
+-- Helper to safely find the Menu Screen RemoteEvent
+local function GetMenuRemote(timeout)
+    timeout = timeout or 5
+    local ok, gui = pcall(function() return LocalPlayer:WaitForChild("PlayerGui", timeout) end)
+    if not ok or not gui then return nil end
+    local menu = gui:FindFirstChild("Menu Screen") or (pcall(function() return gui:WaitForChild("Menu Screen", timeout) end) and gui:FindFirstChild("Menu Screen"))
+    if not menu then return nil end
+    return menu:FindFirstChild("RemoteEvent")
+end
+
+-- EquipWeapon: tries to call the RemoteEvent with the weapon name (uses unpack to match original usage)
+local function EquipWeapon(weaponName)
+    local remote = GetMenuRemote()
+    if not remote or not remote:IsA("RemoteEvent") then return end
+    pcall(function()
+        remote:FireServer(unpack({weaponName}))
+    end)
+end
+
+-- Re-equip enabled weapons after respawn
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(0.8)
+    for name, enabled in pairs(equippedWeapons) do
+        if enabled then
+            EquipWeapon(name)
+        end
+    end
+end)
 
 -- Emerald Greatsword Toggle
 WeaponTab:CreateToggle({
@@ -474,8 +500,6 @@ WeaponTab:CreateToggle({
         equippedWeapons["Emerald Greatsword"] = Value
         if Value and LocalPlayer.Character then
             EquipWeapon("Emerald Greatsword")
-            local args = {"Emerald Greatsword"}
-            LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
         end
     end,
 })
@@ -489,8 +513,6 @@ WeaponTab:CreateToggle({
         equippedWeapons["Blood Dagger"] = Value
         if Value and LocalPlayer.Character then
             EquipWeapon("Blood Dagger")
-            local args = {"Blood Dagger"}
-            LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
         end
     end,
 })
@@ -504,8 +526,9 @@ WeaponTab:CreateToggle({
         equippedWeapons["Frost Spear"] = Value
         if Value and LocalPlayer.Character then
             EquipWeapon("Frost Spear")
-            local args = {"Frost Spear"}
-            LocalPlayer.PlayerGui["Menu Screen"].RemoteEvent:FireServer(unpack(args))
         end
     end,
 })
+
+
+Rayfield:LoadConfiguration()
