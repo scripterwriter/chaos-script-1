@@ -545,7 +545,7 @@ local PlayerDropdown = createdTab:CreateDropdown({
     end
 })
 
-local LoopToggle = Tab:CreateToggle({
+local LoopToggle = createdTab:CreateToggle({
     Name = "Loop Toggle",
     CurrentValue = false,
     Flag = "LoopToggleFlag",
