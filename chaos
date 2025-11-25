@@ -568,26 +568,37 @@ local LoopToggle = createdTab:CreateToggle({
                 while RunLoop do
                     task.wait(0.1)  -- adjust tick if needed
 
-                    local targetPlayer = Players:FindFirstChild(SelectedPlayer)
-                    if not targetPlayer then continue end
-
-                    local char = targetPlayer.Character
-                    if not char then continue end
-
-                    -- Look for any DamageRemote inside the target player
-                    local damageRemote
-                    for _, obj in ipairs(char:GetDescendants()) do
-                        if obj:IsA("RemoteEvent") and obj.Name:match("DamageRemote") then
-                            damageRemote = obj
+                    local targetPlayer
+                    for _, plr in ipairs(Players:GetPlayers()) do
+                        if plr.Name == SelectedPlayer then
+                            targetPlayer = plr
                             break
                         end
                     end
 
-                    if damageRemote then
-                        pcall(function()
-                            -- Fire the target’s DamageRemote; adjust args if necessary
-                            damageRemote:FireServer()
-                        end)
+                    if targetPlayer and targetPlayer.Character then
+                        local char = targetPlayer.Character
+
+                        -- Look for any DamageRemote inside the target player
+                        local damageRemote
+                        for _, obj in ipairs(char:GetDescendants()) do
+                            if obj:IsA("RemoteEvent") and obj.Name:match("DamageRemote") then
+                                damageRemote = obj
+                                break
+                            end
+                        end
+
+                        if damageRemote then
+                            pcall(function()
+                                -- Usually, DamageRemote expects the Humanoid as argument
+                                local hum = char:FindFirstChildOfClass("Humanoid")
+                                if hum then
+                                    damageRemote:FireServer(hum)
+                                else
+                                    damageRemote:FireServer()
+                                end
+                            end)
+                        end
                     end
                 end
             end)
@@ -598,5 +609,8 @@ local LoopToggle = createdTab:CreateToggle({
                 Duration = 2
             })
         end
+    end
+})
+
     end
 })
