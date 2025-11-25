@@ -106,7 +106,7 @@ local Window = Rayfield:CreateWindow({
 
 -- 🌌 TABS
 local Tab = Window:CreateTab("Main", 4483362458)
-local AuraTab = Window:CreateTab("Kill Aura", 4483362458)
+local AuraTab = Window:CreateTab("I created", 4483362458)
 local ScriptsTab = Window:CreateTab("Scripts", 4483362458)
 local WeaponTab = Window:CreateTab("Weapon", 4483362458)
 -- 🌌 HITBOX TOGGLE
@@ -528,6 +528,49 @@ WeaponTab:CreateToggle({
             EquipWeapon("Frost Spear")
         end
     end,
+})
+
+
+local Players = game:GetService("Players")
+local RunLoop = false
+local SelectedPlayer = nil
+
+local PlayerDropdown = Tab:CreateDropdown({
+    Name = "Select Player",
+    Options = GetPlayerList(),
+    CurrentOption = nil,
+    MultipleOptions = false,
+    Callback = function(option)
+        SelectedPlayer = option
+    end
+})
+
+local LoopToggle = Tab:CreateToggle({
+    Name = "Loop Toggle",
+    CurrentValue = false,
+    Flag = "LoopToggleFlag",
+    Callback = function(Value)
+        RunLoop = Value   -- true = start, false = stop
+
+        if RunLoop then
+            if not SelectedPlayer then
+                Notify("No player selected!")
+                LoopToggle:Set(false)
+                return
+            end
+
+            task.spawn(function()
+                while RunLoop do
+                    task.wait()
+
+                    game:GetService("Players"):WaitForChild("LocalPlayer").Character:WaitForChild("Humanoid") game:GetService("Players").LocalPlayer:WaitForChild("Backpack"):WaitForChild("Kawaii Revolver"):WaitForChild("DamageRemote"):FireServer(unpack(args)) end)
+   
+                end
+            end)
+        else
+            Notify("Loop stopped")
+        end
+    end
 })
 
 
