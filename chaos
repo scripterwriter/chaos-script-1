@@ -135,7 +135,7 @@ Tab:CreateSlider({
     end,
 })
 HitboxSection = Tab:CreateSection("Others")
-HitboxButton = HitboxTab:CreateButton({
+OthersButton = Tab:CreateButton({
    Name = "Aimbot",
    Callback = function()
    -- DEPENDS ON FPS, RECOMMENDEDED 45/60+ FPS
@@ -293,50 +293,6 @@ Notify("Aimbot", "Aimbot Initialized. Press 'Q' to toggle. (OR WHATEVER KEYBIND 
 })
 
 
-
-
--- 🌌 KILL AURA TOGGLE
-AuraTab:CreateToggle({
-    Name = "Kill Aura(not availiable)",
-    CurrentValue = false,
-    Callback = function(Value)
-        shared.settings.killaura = Value
-    end,
-})
-
--- 🌌 KILL AURA RANGE SLIDER
-AuraTab:CreateSlider({
-    Name = "Aura Range(not avaliable)",
-    Range = {5, 100},
-    Increment = 1,
-    Suffix = "Studs",
-    CurrentValue = 30,
-    Callback = function(Value)
-        shared.settings.maxdistance = Value
-    end,
-})
-
-
-
--- 🌌 LOOP HANDLER FOR KILL AURA
-task.spawn(function()
-    while task.wait() do
-        if shared.settings.killaura then
-            local DamageRemote = getDamageRemote()
-            if DamageRemote then
-                local Target,Distance = GetClosestPlayer()
-                if Target then
-                    DamageRemote:FireServer(gethumanoid(Target))
-                    if shared.settings.debugging then
-                        warn("Attacked",Target,"from",Distance,"studs away")
-                    end
-                end
-            end
-        end
-    end
-end)
-
-
 OthersButton = Tab:CreateButton({
    Name = "Remove holloween",
    Callback = function()
@@ -415,7 +371,7 @@ local function doDash()
 end
 
 -- 🌌 RAYFIELD BUTTON
-local Button = Tab:CreateButton({
+OthersButton = Tab:CreateButton({
     Name = "Mid-Air Side Dash",
     Callback = function()
         doDash()
