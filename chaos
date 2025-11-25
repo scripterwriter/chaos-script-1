@@ -531,20 +531,10 @@ WeaponTab:CreateToggle({
 })
 
 
--- Function to return current player list
-local function GetPlayerList()
-    local list = {}
-    for _, plr in pairs(Players:GetPlayers()) do
-        if plr ~= LocalPlayer then
-            table.insert(list, plr.Name)
-        end
-    end
-    return list
-end
-
 local RunLoop = false
 local SelectedPlayer = nil
 
+-- Dropdown to select a player
 local PlayerDropdown = AuraTab:CreateDropdown({
     Name = "Select Player",
     Options = GetPlayerList(),
@@ -555,10 +545,11 @@ local PlayerDropdown = AuraTab:CreateDropdown({
     end
 })
 
+-- Loop toggle
 local LoopToggle = AuraTab:CreateToggle({
-    Name = "Loop Toggle",
+    Name = "Loop Player DamageRemote",
     CurrentValue = false,
-    Flag = "LoopToggleFlag",
+    Flag = "LoopPlayerDR",
     Callback = function(Value)
         RunLoop = Value
 
@@ -575,16 +566,28 @@ local LoopToggle = AuraTab:CreateToggle({
 
             task.spawn(function()
                 while RunLoop do
-                    task.wait()
+                    task.wait(0.1)  -- adjust tick if needed
 
-                    local char = LocalPlayer.Character
+                    local targetPlayer = Players:FindFirstChild(SelectedPlayer)
+                    if not targetPlayer then continue end
+
+                    local char = targetPlayer.Character
                     if not char then continue end
 
-                    local tool = LocalPlayer.Backpack:FindFirstChild("Kawaii Revolver") 
-                        or char:FindFirstChild("Kawaii Revolver")
+                    -- Look for any DamageRemote inside the target player
+                    local damageRemote
+                    for _, obj in ipairs(char:GetDescendants()) do
+                        if obj:IsA("RemoteEvent") and obj.Name:match("DamageRemote") then
+                            damageRemote = obj
+                            break
+                        end
+                    end
 
-                    if tool and tool:FindFirstChild("DamageRemote") then
-                        tool.DamageRemote:FireServer(SelectedPlayer)
+                    if damageRemote then
+                        pcall(function()
+                            -- Fire the target’s DamageRemote; adjust args if necessary
+                            damageRemote:FireServer()
+                        end)
                     end
                 end
             end)
