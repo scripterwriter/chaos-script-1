@@ -106,7 +106,7 @@ local Window = Rayfield:CreateWindow({
 
 -- 🌌 TABS
 local Tab = Window:CreateTab("Main", 4483362458)
-local AuraTab = Window:CreateTab("created", 4483362458)
+local createdTab = Window:CreateTab("created", 4483362458)
 local ScriptsTab = Window:CreateTab("Scripts", 4483362458)
 local WeaponTab = Window:CreateTab("Weapon", 4483362458)
 -- 🌌 HITBOX TOGGLE
