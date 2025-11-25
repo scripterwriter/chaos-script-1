@@ -531,11 +531,21 @@ WeaponTab:CreateToggle({
 })
 
 
-local Players = game:GetService("Players")
+-- Function to return current player list
+local function GetPlayerList()
+    local list = {}
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            table.insert(list, plr.Name)
+        end
+    end
+    return list
+end
+
 local RunLoop = false
 local SelectedPlayer = nil
 
-local PlayerDropdown = createdTab:CreateDropdown({
+local PlayerDropdown = AuraTab:CreateDropdown({
     Name = "Select Player",
     Options = GetPlayerList(),
     CurrentOption = nil,
@@ -545,16 +555,20 @@ local PlayerDropdown = createdTab:CreateDropdown({
     end
 })
 
-local LoopToggle = createdTab:CreateToggle({
+local LoopToggle = AuraTab:CreateToggle({
     Name = "Loop Toggle",
     CurrentValue = false,
     Flag = "LoopToggleFlag",
     Callback = function(Value)
-        RunLoop = Value   -- true = start, false = stop
+        RunLoop = Value
 
         if RunLoop then
             if not SelectedPlayer then
-                Notify("No player selected!")
+                Rayfield:Notify({
+                    Title = "Error",
+                    Content = "No player selected!",
+                    Duration = 3
+                })
                 LoopToggle:Set(false)
                 return
             end
@@ -563,15 +577,23 @@ local LoopToggle = createdTab:CreateToggle({
                 while RunLoop do
                     task.wait()
 
-                    game:GetService("Players"):WaitForChild("LocalPlayer").Character:WaitForChild("Humanoid") game:GetService("Players").LocalPlayer:WaitForChild("Backpack"):WaitForChild("Kawaii Revolver"):WaitForChild("DamageRemote"):FireServer(unpack(args)) end)
-   
+                    local char = LocalPlayer.Character
+                    if not char then continue end
+
+                    local tool = LocalPlayer.Backpack:FindFirstChild("Kawaii Revolver") 
+                        or char:FindFirstChild("Kawaii Revolver")
+
+                    if tool and tool:FindFirstChild("DamageRemote") then
+                        tool.DamageRemote:FireServer(SelectedPlayer)
+                    end
                 end
             end)
         else
-            Notify("Loop stopped")
+            Rayfield:Notify({
+                Title = "Loop",
+                Content = "Loop stopped.",
+                Duration = 2
+            })
         end
     end
 })
-
-
-Rayfield:LoadConfiguration()
