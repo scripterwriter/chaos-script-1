@@ -535,7 +535,7 @@ local RunLoop = false
 local SelectedPlayer = nil
 
 -- Dropdown to select a player
-local PlayerDropdown = createdTab:CreateDropdown({
+local PlayerDropdown = AuraTab:CreateDropdown({
     Name = "Select Player",
     Options = GetPlayerList(),
     CurrentOption = nil,
@@ -546,7 +546,7 @@ local PlayerDropdown = createdTab:CreateDropdown({
 })
 
 -- Loop toggle
-local LoopToggle = createdTab:CreateToggle({
+local LoopToggle = AuraTab:CreateToggle({
     Name = "Loop Player DamageRemote",
     CurrentValue = false,
     Flag = "LoopPlayerDR",
