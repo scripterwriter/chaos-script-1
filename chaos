@@ -135,7 +135,7 @@ Tab:CreateSlider({
     end,
 })
 HitboxSection = Tab:CreateSection("Others")
-HitboxButton = Tab:CreateButton({
+HitboxButton = HitboxTab:CreateButton({
    Name = "Aimbot",
    Callback = function()
    -- DEPENDS ON FPS, RECOMMENDEDED 45/60+ FPS
@@ -542,75 +542,5 @@ local PlayerDropdown = AuraTab:CreateDropdown({
     MultipleOptions = false,
     Callback = function(option)
         SelectedPlayer = option
-    end
-})
-
--- Loop toggle
-local LoopToggle = AuraTab:CreateToggle({
-    Name = "Loop Player DamageRemote",
-    CurrentValue = false,
-    Flag = "LoopPlayerDR",
-    Callback = function(Value)
-        RunLoop = Value
-
-        if RunLoop then
-            if not SelectedPlayer then
-                Rayfield:Notify({
-                    Title = "Error",
-                    Content = "No player selected!",
-                    Duration = 3
-                })
-                LoopToggle:Set(false)
-                return
-            end
-
-            task.spawn(function()
-                while RunLoop do
-                    task.wait(0.1)  -- adjust tick if needed
-
-                    local targetPlayer
-                    for _, plr in ipairs(Players:GetPlayers()) do
-                        if plr.Name == SelectedPlayer then
-                            targetPlayer = plr
-                            break
-                        end
-                    end
-
-                    if targetPlayer and targetPlayer.Character then
-                        local char = targetPlayer.Character
-
-                        -- Look for any DamageRemote inside the target player
-                        local damageRemote
-                        for _, obj in ipairs(char:GetDescendants()) do
-                            if obj:IsA("RemoteEvent") and obj.Name:match("DamageRemote") then
-                                damageRemote = obj
-                                break
-                            end
-                        end
-
-                        if damageRemote then
-                            pcall(function()
-                                -- Usually, DamageRemote expects the Humanoid as argument
-                                local hum = char:FindFirstChildOfClass("Humanoid")
-                                if hum then
-                                    damageRemote:FireServer(hum)
-                                else
-                                    damageRemote:FireServer()
-                                end
-                            end)
-                        end
-                    end
-                end
-            end)
-        else
-            Rayfield:Notify({
-                Title = "Loop",
-                Content = "Loop stopped.",
-                Duration = 2
-            })
-        end
-    end
-})
-
     end
 })
